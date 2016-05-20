@@ -2,6 +2,7 @@
 #include "Tokenizer.h"
 #include "TruthTable.h"
 #include "Language.h"
+#include "ForwardChaining.h"
 
 int main(int argc, char** argv)
 {
@@ -37,6 +38,7 @@ int main(int argc, char** argv)
 		}
 	}
 
+#if 0
 	std::vector<TruthTable*> tts;
 	for (Statement* statement : statements)
 	{
@@ -51,6 +53,25 @@ int main(int argc, char** argv)
 		truthTable->PrintTable();
 		std::cout << std::endl << std::endl;
 	}
+
+#endif
+
+	ForwardChaining fc;
+	for (Statement* statement : statements)
+	{
+		if (statement->operators.size() == 0)
+			fc.AddIdentifier(statement->identifiers.front());
+		else
+			fc.AddStatement(statement);
+	}
+	std::vector<String> chain = fc.Solve("d");
+	for (int i = 0; i < chain.size(); i++)
+	{
+		std::cout << chain[i];
+		if (i < chain.size() - 1)
+			std::cout << ", ";
+	}
+	std::cout << std::endl;
 
 #if 0
 	TruthTable tt;
