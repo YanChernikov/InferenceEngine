@@ -129,6 +129,8 @@ bool TruthTable::PerformOperation(bool l, bool r, Operator op)
 	{
 		case Operator::AND:
 			return l && r;
+		case Operator::OR:
+			return l || r;
 		case Operator::IMPLICATION:
 			return !l || r;
 			break;

@@ -126,11 +126,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\BackwardChaining.cpp" />
+    <ClCompile Include="src\ForwardChaining.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
     <ClCompile Include="src\TruthTable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BackwardChaining.h" />
+    <ClInclude Include="src\ForwardChaining.h" />
     <ClInclude Include="src\Language.h" />
     <ClInclude Include="src\Tokenizer.h" />
     <ClInclude Include="src\TruthTable.h" />

@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 
 	Tokenizer tokenizer;
 	tokenizer.AddEndChars(";");
-	tokenizer.AddOperatorChars("=>&");
+	tokenizer.AddOperatorChars("=>&|");
 	tokenizer.AddWhitespaceChars(" \n\r\t");
 	tokenizer.SetString(lines[1]);
 
