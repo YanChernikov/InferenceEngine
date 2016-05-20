@@ -21,3 +21,13 @@ static Operator ParseOperator(const String& op)
 	if (op == "=>")	return Operator::IMPLICATION;
 	return Operator::NONE;
 }
+
+static String OperatorToString(Operator op)
+{
+	switch (op)
+	{
+		case Operator::AND:				return "&";
+		case Operator::IMPLICATION:		return "=>";
+	}
+	return "None";
+}

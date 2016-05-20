@@ -12,26 +12,53 @@ TruthTable::~TruthTable()
 
 void TruthTable::GenerateTable()
 {
-	m_Width = m_Statement->identifiers.size() + m_Statement->operators.size();
-	m_Height = pow(2, m_Statement->identifiers.size());
+	const Statement& statement = *m_Statement;
+
+	m_Width = statement.identifiers.size() + statement.operators.size();
+	m_Height = pow(2, statement.identifiers.size());
 	m_Table = new bool[m_Width * m_Height];
 	memset(m_Table, 0, m_Width * m_Height);
 
-	for (uint i = 0; i < m_Width * m_Height; i++)
+	uint width = statement.identifiers.size();
+	int index = 0;
+	for (uint i = 0; i < width * m_Height; i++)
 	{
-		short shift = (m_Width - 1) - i % m_Width;
-		short counter = i / m_Width;
-		m_Table[i] = (counter >> shift) & 1;
+		unsigned short shift = (width - 1) - i % width;
+		unsigned short counter = i / width;
+		m_Table[index] = (counter >> shift) & 1;
+		if ((i + 1) % statement.identifiers.size() == 0)
+			index += statement.operators.size();
+		index++;
 	}
 
+	if (statement.operators.size() == 0)
+		return;
+
+	// int op = 0;
+	uint lid = GetColumn(statement.identifiers[0]);
+	for (int i = 1, o = 0; i < statement.identifiers.size(); i++, o++)
+	{
+		uint rid = GetColumn(statement.identifiers[i]);
+		Operator op = statement.operators[o];
+		uint column = o + statement.identifiers.size();
+		for (int row = 0; row < m_Height; row++)
+		{
+			bool l = GetValue(lid, row);
+			bool r = GetValue(rid, row);
+			m_Table[column + row * m_Width] = PerformOperation(l, r, op);
+		}
+		lid = column;
+	}
 	
 }
 
 void TruthTable::PrintTable()
 {
 	int space = 0;
+	std::vector<uint> spacing;
 	for (int i = 0; i < m_Statement->identifiers.size(); i++)
 	{
+		spacing.push_back(1);
 		std::cout << " " << m_Statement->identifiers[i] << " ";
 		space += 2 + m_Statement->identifiers[i].size();
 		if (i < m_Statement->identifiers.size() - 1)
@@ -40,6 +67,23 @@ void TruthTable::PrintTable()
 			space++;
 		}
 	}
+
+	if (m_Statement->operators.size() > 0)
+	{
+		std::cout << "| ";
+		uint id = 0;
+		String opString = m_Statement->identifiers[id++] + " ";
+		opString += OperatorToString(m_Statement->operators[0]) + " " + m_Statement->identifiers[id++];
+		std::cout << opString << " | ";
+		spacing.push_back(opString.length());
+		for (int op = 1; op < m_Statement->operators.size(); op++)
+		{
+			opString += String(" ") + OperatorToString(m_Statement->operators[op]) + " " + m_Statement->identifiers[id++];
+			std::cout << " " << opString << " | ";
+			spacing.push_back(opString.length());
+		}
+	}
+
 	std::cout << std::endl;
 	for (int i = 0; i < space; i++)
 		std::cout << "_";
@@ -48,18 +92,62 @@ void TruthTable::PrintTable()
 
 	for (int i = 0; i < m_Width * m_Height; i++)
 	{
+		for (int s = 0; s < spacing[i % m_Width] / 2; s++)
+			std::cout << " ";
 		std::cout << " " << m_Table[i] << " ";
+		for (int s = 0; s < spacing[i % m_Width] / 2; s++)
+			std::cout << " ";
 		if ((i + 1) % m_Width == 0)
 		{
-			std::cout << std::endl;
+			std::cout << "|" << std::endl;
 			for (int i = 0; i < space; i++)
 				std::cout << "-";
 			std::cout << std::endl;
 		}
 		else
 		{
-			if (i < m_Width * m_Height - 1)
-				std::cout << "|";
+			std::cout << "|";
 		}
 	}
+}
+
+bool TruthTable::GetValue(const String& id, uint row)
+{
+	int i;
+	for (i = 0; i < m_Statement->identifiers.size(); i++)
+	{
+		if (m_Statement->identifiers[i] == id)
+			break;
+	}
+	ASSERT(i < m_Statement->identifiers.size());
+	return m_Table[i + row * m_Width];
+}
+
+bool TruthTable::PerformOperation(bool l, bool r, Operator op)
+{
+	switch (op)
+	{
+		case Operator::AND:
+			return l && r;
+		case Operator::IMPLICATION:
+			return !l || r;
+			break;
+	}
+	ASSERT(false);
+	return false;
+}
+
+bool TruthTable::GetValue(uint column, uint row)
+{
+	return m_Table[column + row * m_Width];
+}
+
+uint TruthTable::GetColumn(const String& id)
+{
+	for (int i = 0; i < m_Statement->identifiers.size(); i++)
+	{
+		if (m_Statement->identifiers[i] == id)
+			return i;
+	}
+	return 0;
 }
