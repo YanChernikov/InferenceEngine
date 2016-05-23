@@ -1,5 +1,7 @@
 #include "BackwardChaining.h"
 
+#include <stack>
+
 BackwardChaining::BackwardChaining()
 {
 
@@ -23,38 +25,46 @@ void BackwardChaining::AddStatement(Statement* statement)
 std::vector<String> BackwardChaining::Solve(const String& goal)
 {
 	std::vector<String> chain;
-	String current = goal;
+	chain.push_back(goal);
+//	const String* current = &goal;
 	uint count = 0;
 	
 	// checks to see if one of the identifiers are the goal
 	for (String& id : m_Identifiers)
 	{
 		if (id == goal)
-		{
-			m_VisitedIdentifiers.push_back(id);
-			chain.push_back(id);
 			return chain;
-		}
 	}
-	
-	while (!(count == m_Statements.size()))
-	{
-		for (Statement* s : m_Statements)
-		{
-				m_VisitedStatements.push_back(s);
-				if (s->identifiers.back() == current)
+
+	std::stack<String> ids;
+	ids.push(goal);
+	String current;
+ 	for (int i = 0; i < m_Statements.size(); i++)
+ 	{
+		if (ids.empty())
+			break;
+		String current = ids.top();
+		ids.pop();
+ 		for (Statement* s : m_Statements)
+ 		{
+			if (s->identifiers.back() == current)
+ 			{
+				for (int j = 0; j < s->identifiers.size() - 1; j++)
 				{
-					chain.push_back(s->identifiers.front());
-					current = s->identifiers.front();
+					const String& id = s->identifiers[j];
+					if (VectorContains(chain, id))
+						continue;
+
+ 					chain.push_back(id);
+					ids.push(id);
 				}
-		}
-		count++;
-	}
+ 			}
+ 		}
+ 	}
+
 	if (chain.size() > 1)
-	{
 		std::reverse(chain.begin(), chain.end());
-		chain.push_back(goal);
-	}
+
 	return chain;
 }
 

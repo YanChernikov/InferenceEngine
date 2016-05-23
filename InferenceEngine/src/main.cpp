@@ -135,10 +135,14 @@ int main(int argc, char** argv)
 	std::vector<String> lines = ReadLinesFromFile(input);
 	std::vector<Statement*> statements = ParseStatements(lines[1]);
 	
-	String goal = "d";
-	// TruthTableSolution(goal, statements);
-	ForwardChainingSolution(goal, statements);
-	BackwardChainingSolution(goal, statements);
+	String goals[] = { "a", "b", "c", "d", "e", "f" };
+	for (int i = 0; i < 6; i++)
+	{
+		TruthTableSolution(goals[i], statements);
+		ForwardChainingSolution(goals[i], statements);
+		BackwardChainingSolution(goals[i], statements);
+		std::cout << std::endl;
+	}
 
 	system("PAUSE");
 	return 0;
