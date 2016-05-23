@@ -4,6 +4,8 @@
 #include "Language.h"
 #include "ForwardChaining.h"
 
+#define PRINT_TABLES 0
+
 static void TruthTableSolution(const String& goal, std::vector<Statement*>& statements)
 {
 	std::vector<TruthTable*> tts;
@@ -14,12 +16,21 @@ static void TruthTableSolution(const String& goal, std::vector<Statement*>& stat
 		tts.push_back(tt);
 	}
 
+	uint count = 0;
 	for (TruthTable* truthTable : tts)
 	{
 		truthTable->GenerateTable();
+#if PRINT_TABLES
 		truthTable->PrintTable();
 		std::cout << std::endl << std::endl;
+#endif
+		count += truthTable->Query(goal);
 	}
+
+	if (count > 0)
+		std::cout << "Yes: " << count << std::endl;
+	else
+		std::cout << "No" << std::endl;
 }
 
 static void ForwardChainingSolution(const String& goal, std::vector<Statement*>& statements)
@@ -92,9 +103,9 @@ int main(int argc, char** argv)
 	std::vector<String> lines = ReadLinesFromFile(input);
 	std::vector<Statement*> statements = ParseStatements(lines[1]);
 	
-	String goal = "f";
-	ForwardChainingSolution(goal, statements);
-	// TruthTableSolution(goal, statements);
+	String goal = "d";
+	// ForwardChainingSolution(goal, statements);
+	TruthTableSolution(goal, statements);
 
 	system("PAUSE");
 	return 0;

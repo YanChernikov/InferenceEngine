@@ -36,12 +36,12 @@ void TruthTable::GenerateTable()
 
 	// int op = 0;
 	uint lid = GetColumn(statement.identifiers[0]);
-	for (int i = 1, o = 0; i < statement.identifiers.size(); i++, o++)
+	for (uint i = 1, o = 0; i < statement.identifiers.size(); i++, o++)
 	{
 		uint rid = GetColumn(statement.identifiers[i]);
 		Operator op = statement.operators[o];
 		uint column = o + statement.identifiers.size();
-		for (int row = 0; row < m_Height; row++)
+		for (uint row = 0; row < m_Height; row++)
 		{
 			bool l = GetValue(lid, row);
 			bool r = GetValue(rid, row);
@@ -56,7 +56,7 @@ void TruthTable::PrintTable()
 {
 	int space = 0;
 	std::vector<uint> spacing;
-	for (int i = 0; i < m_Statement->identifiers.size(); i++)
+	for (uint i = 0; i < m_Statement->identifiers.size(); i++)
 	{
 		spacing.push_back(1);
 		std::cout << " " << m_Statement->identifiers[i] << " ";
@@ -76,7 +76,7 @@ void TruthTable::PrintTable()
 		opString += OperatorToString(m_Statement->operators[0]) + " " + m_Statement->identifiers[id++];
 		std::cout << opString << " | ";
 		spacing.push_back(opString.length());
-		for (int op = 1; op < m_Statement->operators.size(); op++)
+		for (uint op = 1; op < m_Statement->operators.size(); op++)
 		{
 			opString += String(" ") + OperatorToString(m_Statement->operators[op]) + " " + m_Statement->identifiers[id++];
 			std::cout << " " << opString << " | ";
@@ -90,12 +90,12 @@ void TruthTable::PrintTable()
 	std::cout << std::endl;
 	std::cout << std::endl;
 
-	for (int i = 0; i < m_Width * m_Height; i++)
+	for (uint i = 0; i < m_Width * m_Height; i++)
 	{
-		for (int s = 0; s < spacing[i % m_Width] / 2; s++)
+		for (uint s = 0; s < spacing[i % m_Width] / 2; s++)
 			std::cout << " ";
 		std::cout << " " << m_Table[i] << " ";
-		for (int s = 0; s < spacing[i % m_Width] / 2; s++)
+		for (uint s = 0; s < spacing[i % m_Width] / 2; s++)
 			std::cout << " ";
 		if ((i + 1) % m_Width == 0)
 		{
@@ -113,7 +113,7 @@ void TruthTable::PrintTable()
 
 bool TruthTable::GetValue(const String& id, uint row)
 {
-	int i;
+	uint i;
 	for (i = 0; i < m_Statement->identifiers.size(); i++)
 	{
 		if (m_Statement->identifiers[i] == id)
@@ -139,17 +139,37 @@ bool TruthTable::PerformOperation(bool l, bool r, Operator op)
 	return false;
 }
 
-bool TruthTable::GetValue(uint column, uint row)
-{
-	return m_Table[column + row * m_Width];
-}
-
 uint TruthTable::GetColumn(const String& id)
 {
-	for (int i = 0; i < m_Statement->identifiers.size(); i++)
+	for (uint i = 0; i < m_Statement->identifiers.size(); i++)
 	{
 		if (m_Statement->identifiers[i] == id)
 			return i;
 	}
 	return 0;
+}
+
+uint TruthTable::Query(const String& id) const
+{
+	const Statement& statement = *m_Statement;
+	for (uint i = 0; i < statement.identifiers.size(); i++)
+	{
+		const String& s = statement.identifiers[i];
+		if (s == id)
+		{
+			if (statement.operators.size() == 0)
+				return Count(i);
+			else
+				return Count(statement.identifiers.size() + (i > 0 ? i - 1 : 0));
+		}
+	}
+	return 0;
+}
+
+uint TruthTable::Count(uint column) const
+{
+	uint result = 0;
+	for (uint row = 0; row < m_Height; row++)
+		result += GetValue(column, row);
+	return result;
 }
