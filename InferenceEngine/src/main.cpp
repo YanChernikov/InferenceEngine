@@ -3,6 +3,7 @@
 #include "TruthTable.h"
 #include "Language.h"
 #include "ForwardChaining.h"
+#include "BackwardChaining.h"
 
 #define PRINT_TABLES 0
 
@@ -64,6 +65,37 @@ static void ForwardChainingSolution(const String& goal, std::vector<Statement*>&
 	}
 }
 
+static void BackwardChainingSolution(const String& goal, std::vector<Statement*>& statements)
+{
+	BackwardChaining bc;
+	for (Statement* statement : statements)
+	{
+		if (statement->operators.size() == 0)
+			bc.AddIdentifier(statement->identifiers.front());
+		else
+			bc.AddStatement(statement);
+	}
+
+	std::cout << "Solving for query '" << goal << "' using Backward Chaining." << std::endl;
+	std::vector<String> chain = bc.Solve(goal);
+	if (chain.size())
+	{
+		std::cout << "Solution found:" << std::endl;
+		std::cout << "\t";
+		for (uint i = 0; i < chain.size(); i++)
+		{
+			std::cout << chain[i];
+			if (i < chain.size() - 1)
+				std::cout << ", ";
+		}
+		std::cout << std::endl;
+	}
+	else
+	{
+		std::cout << "No solution found." << std::endl;
+	}
+}
+
 static std::vector<Statement*> ParseStatements(const String& input)
 {
 	Tokenizer tokenizer;
@@ -104,8 +136,9 @@ int main(int argc, char** argv)
 	std::vector<Statement*> statements = ParseStatements(lines[1]);
 	
 	String goal = "d";
-	// ForwardChainingSolution(goal, statements);
-	TruthTableSolution(goal, statements);
+	// TruthTableSolution(goal, statements);
+	ForwardChainingSolution(goal, statements);
+	BackwardChainingSolution(goal, statements);
 
 	system("PAUSE");
 	return 0;
