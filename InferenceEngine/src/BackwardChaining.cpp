@@ -24,7 +24,9 @@ void BackwardChaining::AddStatement(Statement* statement)
 
 std::vector<String> BackwardChaining::Solve(const String& goal)
 {
+	// vector of strings to store the result
 	std::vector<String> chain;
+	// pushes back initial goal state
 	chain.push_back(goal);
 //	const String* current = &goal;
 	uint count = 0;
@@ -36,21 +38,32 @@ std::vector<String> BackwardChaining::Solve(const String& goal)
 			return chain;
 	}
 
+	// stack to keep track of id's that need to be visited.
 	std::stack<String> ids;
 	ids.push(goal);
 	String current;
+
+	// loops through all the statements. 
  	for (int i = 0; i < m_Statements.size(); i++)
  	{
 		if (ids.empty())
 			break;
+		// sets the current statement/id to top of stack.
 		String current = ids.top();
 		ids.pop();
+
  		for (Statement* s : m_Statements)
- 		{
+ 		{	
+ 			// checks to see if the current identifier on the right hand side is
+ 			// equal to the current identifier being processed
 			if (s->identifiers.back() == current)
  			{
+ 				// loops through the identifiers not taking into account
+ 				// the right most side of the statement. 
 				for (int j = 0; j < s->identifiers.size() - 1; j++)
 				{
+					// sets id as as the identifiers at index J, checks to see if it contained
+					// within the result, pushes back id into stack and result. 
 					const String& id = s->identifiers[j];
 					if (VectorContains(chain, id))
 						continue;
@@ -62,6 +75,9 @@ std::vector<String> BackwardChaining::Solve(const String& goal)
  		}
  	}
 
+ 	// if the chain size is greater than one
+ 	// meaning some result has been found, it will reverse the order of results
+ 	// to print in the desired format. 
 	if (chain.size() > 1)
 		std::reverse(chain.begin(), chain.end());
 
