@@ -5,7 +5,7 @@
 #include "ForwardChaining.h"
 #include "BackwardChaining.h"
 
-#define PRINT_TABLES 0
+#define PRINT_TABLES 1
 
 static void TruthTableSolution(const String& goal, std::vector<Statement*>& statements)
 {
@@ -100,7 +100,7 @@ static std::vector<Statement*> ParseStatements(const String& input)
 {
 	Tokenizer tokenizer;
 	tokenizer.AddEndChars(";");
-	tokenizer.AddOperatorChars("=>&|");
+	tokenizer.AddOperatorChars("<=>&|\\/");
 	tokenizer.AddWhitespaceChars(" \n\r\t");
 	tokenizer.SetString(input);
 
@@ -136,11 +136,11 @@ int main(int argc, char** argv)
 	std::vector<Statement*> statements = ParseStatements(lines[1]);
 	
 	String goals[] = { "a", "b", "c", "d", "e", "f" };
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		TruthTableSolution(goals[i], statements);
-		ForwardChainingSolution(goals[i], statements);
-		BackwardChainingSolution(goals[i], statements);
+		//ForwardChainingSolution(goals[i], statements);
+		//BackwardChainingSolution(goals[i], statements);
 		std::cout << std::endl;
 	}
 

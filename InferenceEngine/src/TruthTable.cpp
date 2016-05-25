@@ -25,9 +25,13 @@ void TruthTable::GenerateTable()
 	{
 		unsigned short shift = (width - 1) - i % width;
 		unsigned short counter = i / width;
-		m_Table[index] = (counter >> shift) & 1;
+		int value = (counter >> shift) & 1;
+		if (statement.identifiers[i % statement.identifiers.size()][0] == '~')
+			value = 1 - value;
+		m_Table[index] = value;
 		if ((i + 1) % statement.identifiers.size() == 0)
 			index += statement.operators.size();
+
 		index++;
 	}
 
@@ -130,10 +134,14 @@ bool TruthTable::PerformOperation(bool l, bool r, Operator op)
 		case Operator::AND:
 			return l && r;
 		case Operator::OR:
+		case Operator::DISJUNCTION:
 			return l || r;
 		case Operator::IMPLICATION:
 			return !l || r;
-			break;
+		case Operator::NEGATION:
+			return !l;
+		case Operator::BICONDITIONAL:
+			return l == r;
 	}
 	ASSERT(false);
 	return false;
