@@ -131,10 +131,36 @@ static std::vector<Statement*> ParseStatements(const String& input)
 
 int main(int argc, char** argv)
 {
+	String method = "TT";
 	String input = "res/input.txt";
 	std::vector<String> lines = ReadLinesFromFile(input);
-	std::vector<Statement*> statements = ParseStatements(lines[1]);
-	
+
+	const String* knowledgeBase = nullptr;
+	const String* query = nullptr;
+	for (int i = 0; i < lines.size(); i++)
+	{
+		const String& line = lines[i];
+		if (line.find("TELL") != String::npos)
+			knowledgeBase = &lines[++i];
+		else if (line.find("ASK") != String::npos)
+			query = &lines[++i];
+	}
+
+	if (!knowledgeBase || !query)
+	{
+		std::cout << "Error: invalid input file format!" << std::endl;
+		return 1;
+	}
+
+	std::vector<Statement*> statements = ParseStatements(*knowledgeBase);
+	if (method == "TT")
+		TruthTableSolution(*query, statements);
+	else if (method == "FC")
+		ForwardChainingSolution(*query, statements);
+	else if (method == "BC")
+		BackwardChainingSolution(*query, statements);
+
+#if 0
 	String goals[] = { "a", "b", "c", "d", "e", "f" };
 	for (int i = 0; i < 1; i++)
 	{
@@ -143,6 +169,7 @@ int main(int argc, char** argv)
 		//BackwardChainingSolution(goals[i], statements);
 		std::cout << std::endl;
 	}
+#endif
 
 	system("PAUSE");
 	return 0;
