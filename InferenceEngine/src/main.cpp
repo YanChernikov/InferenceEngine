@@ -8,11 +8,14 @@
 
 #include <algorithm>
 
+// Used for debugging
 #define PRINT_TABLES 0
 
+// Attempt to solve using the truth table solution
 static void TruthTableSolution(const String& goal, std::vector<Statement*>& statements, bool allowSpaces = false)
 {
 	String string = goal;
+	// Remove spaces since they should be ignored (i.e. variables should not be split)
 	if (allowSpaces)
 		string.erase(std::remove(string.begin(), string.end(), ' '), string.end());
 
@@ -49,6 +52,7 @@ static void TruthTableSolution(const String& goal, std::vector<Statement*>& stat
 		std::cout << "No" << std::endl;
 }
 
+// Attempt to solve using the forward chaining solution
 static void ForwardChainingSolution(const String& goal, std::vector<Statement*>& statements)
 {
 	ForwardChaining fc;
@@ -80,6 +84,7 @@ static void ForwardChainingSolution(const String& goal, std::vector<Statement*>&
 	}
 }
 
+// Attempt to solve using the backward chaining solution
 static void BackwardChainingSolution(const String& goal, std::vector<Statement*>& statements)
 {
 	BackwardChaining bc;
@@ -114,6 +119,7 @@ static void BackwardChainingSolution(const String& goal, std::vector<Statement*>
 static std::vector<Statement*> ParseStatements(const String& input, bool allowSpaces = false)
 {
 	String string = input;
+	// Remove spaces since they should be ignored (i.e. variables should not be split)
 	if (allowSpaces)
 		string.erase(std::remove(string.begin(), string.end(), ' '), string.end());
 
@@ -150,24 +156,17 @@ static std::vector<Statement*> ParseStatements(const String& input, bool allowSp
 	return statements;
 }
 
+// Parse English sentence and try and convert it into propositional logic
 static String ParseEnglish(const String& input)
 {
 	std::cout << input << std::endl;
 
 	EnglishTokenizer tokenizer;
 	tokenizer.AddEndChars(";");
-	//tokenizer.AddKeyword("if");
 	tokenizer.AddKeyword("and");
 	tokenizer.AddKeyword("or");
 	tokenizer.AddKeyword("not");
 	tokenizer.AddKeyword("then");
-	tokenizer.AddIgnoredWord("it");
-	tokenizer.AddIgnoredWord("is");
-	tokenizer.AddIgnoredWord("does");
-	tokenizer.AddIgnoredWord("a");
-	tokenizer.AddIgnoredWord("the");
-	tokenizer.AddIgnoredWord("he");
-	tokenizer.AddIgnoredWord("she");
 	tokenizer.LoadNouns("res/nounlist.txt");
 	tokenizer.LoadAdjectives("res/adjectives.txt");
 	tokenizer.AddWhitespaceChars(" \n\r\t");
@@ -194,9 +193,11 @@ static String ParseEnglish(const String& input)
 		}
 	}
 	std::cout << string << std::endl;
+	delete statement;
 	return string;
 }
 
+// Print program usage
 static void PrintUsage()
 {
 	std::cout << "\tUsage: iengine method(TT|FC|BC) filename" << std::endl;
@@ -226,6 +227,7 @@ int main(int argc, char** argv)
 			query = &lines[++i];
 	}
 
+	// Apply natural language processing and solve via truth table
 	if (method == "ENG")
 	{
 		String sentence = *knowledgeBase + ";";
@@ -248,6 +250,12 @@ int main(int argc, char** argv)
 	else if (method == "FC")
 		ForwardChainingSolution(*query, statements);
 	else if (method == "BC")
-		BackwardChainingSolution(*query, statements);
+		BackwardChainingSolution(*query, statements); 
+	else
+	{
+		std::cout << "Error: Invalid method!";
+		PrintUsage();
+		return 3;
+	}
 	return 0;
 } 

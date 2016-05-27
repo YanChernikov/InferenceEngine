@@ -25,6 +25,8 @@ public:
 	uint Count(uint column) const;
 
 	inline void SetStatement(Statement* statement) { m_Statement = statement; }
+	// Retrieves a pointer to the beginning of a row
 	inline bool* GetRow(uint row) { return &m_Table[row * m_Width]; }
+	// Returns the value of a cell in the truth table
 	inline bool GetValue(uint column, uint row) const { return m_Table[column + row * m_Width]; }
 };

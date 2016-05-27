@@ -2,7 +2,6 @@
 
 TruthTable::TruthTable()
 {
-
 }
 
 TruthTable::~TruthTable()
@@ -10,6 +9,7 @@ TruthTable::~TruthTable()
 	delete m_Table;
 }
 
+// Parses the statements and generates the truth table
 void TruthTable::GenerateTable()
 {
 	const Statement& statement = *m_Statement;
@@ -26,7 +26,7 @@ void TruthTable::GenerateTable()
 		unsigned short shift = (width - 1) - i % width;
 		unsigned short counter = i / width;
 		int value = (counter >> shift) & 1;
-		if (statement.identifiers[i % statement.identifiers.size()][0] == '~')
+		if (statement.identifiers[i % statement.identifiers.size()][0] == '~') // Negation support
 			value = 1 - value;
 		m_Table[index] = value;
 		if ((i + 1) % statement.identifiers.size() == 0)
@@ -56,6 +56,7 @@ void TruthTable::GenerateTable()
 	
 }
 
+// For debugging: prints the entire truth table
 void TruthTable::PrintTable()
 {
 	int space = 0;
@@ -115,6 +116,7 @@ void TruthTable::PrintTable()
 	}
 }
 
+// Retrieves the value of an identifier for a given row in the table
 bool TruthTable::GetValue(const String& id, uint row)
 {
 	uint i;
@@ -127,6 +129,8 @@ bool TruthTable::GetValue(const String& id, uint row)
 	return m_Table[i + row * m_Width];
 }
 
+// This function performs the given operation on the two given input arguments,
+// returning the result.
 bool TruthTable::PerformOperation(bool l, bool r, Operator op)
 {
 	switch (op)
@@ -157,6 +161,7 @@ uint TruthTable::GetColumn(const String& id)
 	return 0;
 }
 
+// Returns the occurence of a particular identifier being true in the truth table
 uint TruthTable::Query(const String& id) const
 {
 	const Statement& statement = *m_Statement;
@@ -174,11 +179,13 @@ uint TruthTable::Query(const String& id) const
 	return 0;
 }
 
+// Counts the number of true rows in the last truth table column
 uint TruthTable::QueryLast() const
 {
 	return Count(m_Width - 1);
 }
 
+// Counts the number of true rows for a given truth table column
 uint TruthTable::Count(uint column) const
 {
 	uint result = 0;

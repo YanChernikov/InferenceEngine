@@ -3,6 +3,7 @@
 #include <Common/Common.h>
 #include <vector>
 
+// All supported operators
 enum class Operator
 {
 	NONE = 0, AND, OR, IMPLICATION, NEGATION, DISJUNCTION, BICONDITIONAL

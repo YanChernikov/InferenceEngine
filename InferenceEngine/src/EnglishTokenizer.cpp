@@ -96,6 +96,7 @@ void StripPunctuation(String& string)
 	string.erase(std::remove(string.begin(), string.end(), '.'), string.end());
 }
 
+// This method works the same as Tokenizer::Next, however with keyword and language support
 bool EnglishTokenizer::Next(EnglishToken& token)
 {
 	if (m_StringPos >= m_CurrentString.size())
@@ -117,16 +118,21 @@ bool EnglishTokenizer::Next(EnglishToken& token)
 			}
 			else
 			{
+				// If we're processing a word
 				if (prevState == State::WORD)
 				{
+					// Is the word a keyword?
 					if (m_Keywords.find(buffer) != m_Keywords.end())
 						token.type = EnglishToken::Type::OPERATOR;
+					// Is it a noun?
 					else if (m_Nouns.find(buffer) != m_Nouns.end())
 						token.type = EnglishToken::Type::IDENTIFIER;
+					// Is it an adjective?
 					else if (m_Adjectives.find(buffer) != m_Adjectives.end())
 						token.type = EnglishToken::Type::IDENTIFIER;
 					else
 					{
+						// Strip punctuation and other irrelevant parts of the word and try again
 						StripPunctuation(buffer);
 						if (m_Nouns.find(buffer) != m_Nouns.end())
 							token.type = EnglishToken::Type::IDENTIFIER;

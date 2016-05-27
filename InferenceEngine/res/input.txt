@@ -1,5 +1,5 @@
 TELL
-p2=> p3; p3 => p1; b&e => f; f&g => h; p1=>d; p1&p3 => c; a; b; p2;
+If it is raining, and John does not take an umbrella, then he gets wet
 
 ASK
 d

@@ -65,13 +65,18 @@ Token::Type Tokenizer::TokenizerStateToTokenType(Tokenizer::State state)
 	return Token::Type::UNKNOWN;
 }
 
+// This function will attempt to retrieve the next token from the string,
+// returning true if it successfully retrieves a token, and false if there
+// are no more tokens. The token passed in the parameter is set.
 bool Tokenizer::Next(Token& token)
 {
+	// No more tokens left; entire string has been searched
 	if (m_StringPos >= m_CurrentString.size())
 		return false;
 
 	State prevState = State::NONE;
 	String buffer;
+	// Iterate through the string one character at a time
 	for ( ; m_StringPos < m_CurrentString.size(); m_StringPos++)
 	{
 		char c = m_CurrentString[m_StringPos];
@@ -80,6 +85,7 @@ bool Tokenizer::Next(Token& token)
 			prevState = state;
 		else if (state != prevState)
 		{
+			// Clear the buffer if it contains whitespace
 			if (prevState == State::WS)
 			{
 				buffer.clear();
@@ -88,11 +94,12 @@ bool Tokenizer::Next(Token& token)
 			{
 				token.type = TokenizerStateToTokenType(prevState);
 				token.token = buffer;
-				return true;
+				return true; // Token found + completely read
 			}
 			prevState = state;
 		}
 		buffer += c;
 	}
+	// No more tokens in the string
 	return false;
 }

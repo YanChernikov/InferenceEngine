@@ -7,7 +7,8 @@ ForwardChaining::ForwardChaining()
 
 ForwardChaining::~ForwardChaining()
 {
-
+	for (Statement* s : m_VisitedStatements)
+		delete s;
 }
 
 void ForwardChaining::AddIdentifier(const String& id)
@@ -25,9 +26,7 @@ std::vector<String> ForwardChaining::Solve(const String& goal)
 	// Start with identifiers
 	std::vector<String> chain;
 	while (Try(chain))
-	// for (String& id : m_Identifiers)
 	{
-		// chain.push_back(id);
 statement:
 		String& current = chain.back();
 		m_VisitedIdentifiers.push_back(current);
@@ -61,6 +60,7 @@ statement:
 				{
 					chain.push_back(s->identifiers.back());
 					m_VisitedStatements.push_back(s);
+					// Go through the statements again with a new value in the chain
 					goto statement;
 				}
 			}
@@ -71,6 +71,7 @@ statement:
 	return std::vector<String>();
 }
 
+// Tries to add an identifier to the chain
 bool ForwardChaining::Try(std::vector<String>& chain)
 {
 	for (String& id : m_Identifiers)
@@ -95,6 +96,7 @@ bool ForwardChaining::Try(std::vector<String>& chain)
 	return false;
 }
 
+// Check if the given vector contains a string
 bool ForwardChaining::VectorContains(const std::vector<String>& vector, const String& string)
 {
 	for (const String& s : vector)
@@ -105,6 +107,7 @@ bool ForwardChaining::VectorContains(const std::vector<String>& vector, const St
 	return false;
 }
 
+// Check if the given vector contains a statement
 bool ForwardChaining::VectorContains(const std::vector<Statement*>& vector, const Statement* statement)
 {
 	for (const Statement* s : vector)

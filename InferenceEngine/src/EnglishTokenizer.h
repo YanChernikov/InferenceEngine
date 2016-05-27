@@ -17,6 +17,8 @@ public:
 	static String TokenTypeToString(Type type);
 };
 
+// A specialised version of the Tokenizer which supports keywords, ignored words,
+// and word sets (i.e. nouns and adjectives)
 class EnglishTokenizer
 {
 private:
