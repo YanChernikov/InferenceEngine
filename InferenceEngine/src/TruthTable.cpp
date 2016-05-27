@@ -174,6 +174,11 @@ uint TruthTable::Query(const String& id) const
 	return 0;
 }
 
+uint TruthTable::QueryLast() const
+{
+	return Count(m_Width - 1);
+}
+
 uint TruthTable::Count(uint column) const
 {
 	uint result = 0;

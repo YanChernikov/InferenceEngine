@@ -21,6 +21,7 @@ public:
 	uint GetColumn(const String& id);
 
 	uint Query(const String& id) const;
+	uint QueryLast() const;
 	uint Count(uint column) const;
 
 	inline void SetStatement(Statement* statement) { m_Statement = statement; }

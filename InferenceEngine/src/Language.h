@@ -26,6 +26,15 @@ static Operator ParseOperator(const String& op)
 	return Operator::NONE;
 }
 
+static Operator ParseEnglishOperator(const String& op)
+{
+	if (op == "and")	return Operator::AND;
+	if (op == "or")		return Operator::OR;
+	if (op == "then")	return Operator::IMPLICATION;
+	if (op == "not")	return Operator::NEGATION;
+	return Operator::NONE;
+}
+
 static String OperatorToString(Operator op)
 {
 	switch (op)

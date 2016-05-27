@@ -21,6 +21,7 @@ StringList GetLines(const String& string);
 
 const char* FindToken(const char* str, const String& token);
 const char* FindToken(const String& string, const String& token);
+bool Contains(const String& string, const String& chars);
 
 String GetBlock(const char* str, const char** outPosition = nullptr);
 String GetBlock(const String& string, int offset = 0);

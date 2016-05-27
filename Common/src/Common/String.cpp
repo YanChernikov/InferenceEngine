@@ -104,6 +104,11 @@ const char* FindToken(const String& string, const String& token)
 	return FindToken(string.c_str(), token);
 }
 
+bool Contains(const String& string, const String& chars)
+{
+	return string.find(chars) != String::npos;
+}
+
 String GetBlock(const char* str, const char** outPosition)
 {
 	const char* end = strstr(str, "}");

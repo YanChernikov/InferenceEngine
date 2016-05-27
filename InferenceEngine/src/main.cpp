@@ -1,14 +1,21 @@
 #include <Common/Common.h>
 #include "Tokenizer.h"
+#include "EnglishTokenizer.h"
 #include "TruthTable.h"
 #include "Language.h"
 #include "ForwardChaining.h"
 #include "BackwardChaining.h"
 
-#define PRINT_TABLES 1
+#include <algorithm>
 
-static void TruthTableSolution(const String& goal, std::vector<Statement*>& statements)
+#define PRINT_TABLES 0
+
+static void TruthTableSolution(const String& goal, std::vector<Statement*>& statements, bool allowSpaces = false)
 {
+	String string = goal;
+	if (allowSpaces)
+		string.erase(std::remove(string.begin(), string.end(), ' '), string.end());
+
 	std::vector<TruthTable*> tts;
 	for (Statement* statement : statements)
 	{
@@ -16,6 +23,11 @@ static void TruthTableSolution(const String& goal, std::vector<Statement*>& stat
 		tt->SetStatement(statement);
 		tts.push_back(tt);
 	}
+
+	if (allowSpaces)
+		std::cout << "Solving..." << std::endl;
+	else
+		std::cout << "Solving for query '" << goal << "' using Truth Tables." << std::endl;
 
 	uint count = 0;
 	for (TruthTable* truthTable : tts)
@@ -25,7 +37,10 @@ static void TruthTableSolution(const String& goal, std::vector<Statement*>& stat
 		truthTable->PrintTable();
 		std::cout << std::endl << std::endl;
 #endif
-		count += truthTable->Query(goal);
+		if (allowSpaces)
+			count += truthTable->QueryLast();
+		else
+			count += truthTable->Query(string);
 	}
 
 	if (count > 0)
@@ -96,13 +111,19 @@ static void BackwardChainingSolution(const String& goal, std::vector<Statement*>
 	}
 }
 
-static std::vector<Statement*> ParseStatements(const String& input)
+static std::vector<Statement*> ParseStatements(const String& input, bool allowSpaces = false)
 {
+	String string = input;
+	if (allowSpaces)
+		string.erase(std::remove(string.begin(), string.end(), ' '), string.end());
+
+	string += ";";
+
 	Tokenizer tokenizer;
 	tokenizer.AddEndChars(";");
 	tokenizer.AddOperatorChars("<=>&|\\/");
 	tokenizer.AddWhitespaceChars(" \n\r\t");
-	tokenizer.SetString(input);
+	tokenizer.SetString(string);
 
 	Token* lastToken = nullptr;
 	Token token;
@@ -129,10 +150,69 @@ static std::vector<Statement*> ParseStatements(const String& input)
 	return statements;
 }
 
+static String ParseEnglish(const String& input)
+{
+	std::cout << input << std::endl;
+
+	EnglishTokenizer tokenizer;
+	tokenizer.AddEndChars(";");
+	//tokenizer.AddKeyword("if");
+	tokenizer.AddKeyword("and");
+	tokenizer.AddKeyword("or");
+	tokenizer.AddKeyword("not");
+	tokenizer.AddKeyword("then");
+	tokenizer.AddIgnoredWord("it");
+	tokenizer.AddIgnoredWord("is");
+	tokenizer.AddIgnoredWord("does");
+	tokenizer.AddIgnoredWord("a");
+	tokenizer.AddIgnoredWord("the");
+	tokenizer.AddIgnoredWord("he");
+	tokenizer.AddIgnoredWord("she");
+	tokenizer.LoadNouns("res/nounlist.txt");
+	tokenizer.LoadAdjectives("res/adjectives.txt");
+	tokenizer.AddWhitespaceChars(" \n\r\t");
+	tokenizer.SetString(input);
+
+	Statement* statement = new Statement();
+	EnglishToken token;
+	String string;
+	while (tokenizer.Next(token))
+	{
+		switch (token.type)
+		{
+			case EnglishToken::Type::IDENTIFIER:
+				statement->identifiers.push_back(token.token);
+				string += token.token + " ";
+				break;
+			case EnglishToken::Type::OPERATOR:
+				statement->operators.push_back(ParseEnglishOperator(token.token));
+				Operator op = ParseEnglishOperator(token.token);
+				string += OperatorToString(op);
+				if (op != Operator::NEGATION)
+					string += " ";
+				break;
+		}
+	}
+	std::cout << string << std::endl;
+	return string;
+}
+
+static void PrintUsage()
+{
+	std::cout << "\tUsage: iengine method(TT|FC|BC) filename" << std::endl;
+}
+
 int main(int argc, char** argv)
 {
-	String method = "TT";
-	String input = "res/input.txt";
+	if (argc != 3)
+	{
+		std::cout << "Error: Incorrect input arguments!" << std::endl;
+		PrintUsage();
+		return 1;
+	}
+
+	String method = argv[1];
+	String input = argv[2];
 	std::vector<String> lines = ReadLinesFromFile(input);
 
 	const String* knowledgeBase = nullptr;
@@ -140,16 +220,26 @@ int main(int argc, char** argv)
 	for (int i = 0; i < lines.size(); i++)
 	{
 		const String& line = lines[i];
-		if (line.find("TELL") != String::npos)
+		if (Contains(line, "TELL"))
 			knowledgeBase = &lines[++i];
-		else if (line.find("ASK") != String::npos)
+		else if (Contains(line, "ASK"))
 			query = &lines[++i];
+	}
+
+	if (method == "ENG")
+	{
+		String sentence = *knowledgeBase + ";";
+		sentence = ParseEnglish(sentence);
+		std::vector<Statement*> statements = ParseStatements(sentence, true);
+		TruthTableSolution(*query, statements, true);
+		return 0;
 	}
 
 	if (!knowledgeBase || !query)
 	{
 		std::cout << "Error: invalid input file format!" << std::endl;
-		return 1;
+		PrintUsage();
+		return 2;
 	}
 
 	std::vector<Statement*> statements = ParseStatements(*knowledgeBase);
@@ -159,18 +249,5 @@ int main(int argc, char** argv)
 		ForwardChainingSolution(*query, statements);
 	else if (method == "BC")
 		BackwardChainingSolution(*query, statements);
-
-#if 0
-	String goals[] = { "a", "b", "c", "d", "e", "f" };
-	for (int i = 0; i < 1; i++)
-	{
-		TruthTableSolution(goals[i], statements);
-		//ForwardChainingSolution(goals[i], statements);
-		//BackwardChainingSolution(goals[i], statements);
-		std::cout << std::endl;
-	}
-#endif
-
-	system("PAUSE");
 	return 0;
 } 

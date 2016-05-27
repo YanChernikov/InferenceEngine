@@ -71,10 +71,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(Configuration)\Intemediates\$(ProjectName)\</IntDir>
+    <TargetName>iengine</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(Configuration)\Intemediates\$(ProjectName)\</IntDir>
+    <TargetName>iengine</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -127,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BackwardChaining.cpp" />
+    <ClCompile Include="src\EnglishTokenizer.cpp" />
     <ClCompile Include="src\ForwardChaining.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Tokenizer.cpp" />
@@ -134,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BackwardChaining.h" />
+    <ClInclude Include="src\EnglishTokenizer.h" />
     <ClInclude Include="src\ForwardChaining.h" />
     <ClInclude Include="src\Language.h" />
     <ClInclude Include="src\Tokenizer.h" />

@@ -1,0 +1,5 @@
+TELL
+If it is raining, and John does not take an umbrella, then he gets wet
+
+ASK
+sky blue
